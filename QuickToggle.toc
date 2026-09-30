@@ -1,0 +1,16 @@
+## Interface: 16001
+## Title: QuickToggle
+## Title-ruRU: QuickToggle
+## Notes: One small clock icon to toggle auto loot, auto accept and auto turn in of quests.
+## Notes-ruRU: Маленькая иконка часов: автолут, автопринятие и автосдача квестов.
+## Author: embox
+## Version: @project-version@
+## Category: Quests & Leveling
+## Category-ruRU: Задания и развитие
+## IconTexture: Interface\Icons\INV_Misc_PocketWatch_01
+## SavedVariables: QuickToggleDB
+## X-License: MIT
+
+Locales.lua
+Core.lua
+UI.lua
