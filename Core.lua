@@ -17,6 +17,9 @@ local defaults = {
     autoTurnIn = false,
     locked = false,
     shown = true,
+    tooltip = true,
+    size = 20,   -- icon size in px
+    alpha = 100, -- icon opacity in percent
     point = ns.defaultPosition.point,
     relPoint = ns.defaultPosition.relPoint,
     x = ns.defaultPosition.x,
@@ -171,6 +174,7 @@ SlashCmdList.QUICKTOGGLE = function(msg)
     if msg == "lock" then
         db.locked = not db.locked
         ns.Print(db.locked and L.LOCKED or L.UNLOCKED)
+        ns.RefreshUI()
     elseif msg == "reset" then
         ns.ResetPosition()
         ns.Print(L.RESET)

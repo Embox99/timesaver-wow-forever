@@ -13,9 +13,15 @@ quality-of-life automations on and off.
 - **Hold Shift** while talking to an NPC or opening loot to skip the
   automation once.
 
-The icon is 20×20 pixels and can be dragged anywhere. Its border turns gold
-while at least one toggle is on. Click it to open the menu; click outside
-or press Escape to close it. Position and toggles are saved.
+The round clock icon can be dragged anywhere. Its ring turns gold while at
+least one toggle is on.
+
+- **Left click** – menu with the three toggles.
+- **Right click** – settings: icon size, opacity, lock position, tooltip,
+  reset position.
+- Click outside or press Escape to close a menu.
+
+Everything is saved between sessions.
 
 ## Commands
 
