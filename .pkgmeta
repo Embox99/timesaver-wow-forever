@@ -7,3 +7,6 @@ manual-changelog:
 ignore:
   - README.md
   - build.ps1
+  - screenshots
+  - tools
+  - Media/icon-preview.png

@@ -1,20 +1,28 @@
--- Settings, automation and slash commands. The visual part lives in UI.lua.
+-- Settings, event dispatch and slash commands.
+-- Automation lives in Quests.lua, Vendor.lua, Mail.lua and Social.lua; visuals in UI.lua.
 local ADDON, ns = ...
 local L = ns.L
 
--- Order here is the order of rows in the menu.
+-- Rows of the menu, in display order. icon: Interface\Icons\<name>,
+-- or a full path for the quest "!" / "?" glyphs.
 ns.toggles = {
-    { key = "autoLoot",   label = L.AUTO_LOOT },
-    { key = "autoQuest",  label = L.AUTO_ACCEPT },
-    { key = "autoTurnIn", label = L.AUTO_TURN_IN },
+    { key = "autoLoot",      label = L.AUTO_LOOT,      icon = "INV_Misc_Bag_10" },
+    { key = "autoQuest",     label = L.AUTO_ACCEPT,    icon = "Interface\\GossipFrame\\AvailableQuestIcon" },
+    { key = "autoTurnIn",    label = L.AUTO_TURN_IN,   icon = "Interface\\GossipFrame\\ActiveQuestIcon" },
+    { key = "bestReward",    label = L.BEST_REWARD,    icon = "INV_Misc_Gift_01" },
+    { key = "sellJunk",      label = L.SELL_JUNK,      icon = "INV_Misc_Coin_01" },
+    { key = "autoRepair",    label = L.AUTO_REPAIR,    icon = "Trade_BlackSmithing" },
+    { key = "mailTakeAll",   label = L.MAIL_TAKE_ALL,  icon = "INV_Letter_15" },
+    { key = "acceptInvites", label = L.ACCEPT_INVITES, icon = "Spell_Holy_PrayerOfFortitude" },
+    { key = "declineDuels",  label = L.DECLINE_DUELS,  icon = "INV_Sword_04" },
+    { key = "declineGuild",  label = L.DECLINE_GUILD,  icon = "INV_Shirt_GuildTabard_01" },
+    { key = "declineTrades", label = L.DECLINE_TRADES, icon = "INV_Scroll_03" },
 }
 
 ns.defaultPosition = { point = "CENTER", relPoint = "CENTER", x = 0, y = 200 }
 
 local defaults = {
-    autoLoot = false,
-    autoQuest = false,
-    autoTurnIn = false,
+    hidden = {}, -- [toggle key] = true: not listed in the menu
     locked = false,
     shown = true,
     tooltip = true,
@@ -25,10 +33,30 @@ local defaults = {
     x = ns.defaultPosition.x,
     y = ns.defaultPosition.y,
 }
+for _, t in ipairs(ns.toggles) do
+    defaults[t.key] = false
+end
+-- the options panel needs them for its "Defaults" button
+ns.defaults = defaults
 
 function ns.Print(msg)
     DEFAULT_CHAT_FRAME:AddMessage("|cffffd100" .. L.TITLE .. "|r: " .. msg)
 end
+
+-- "1g 2s 3c" in coin colors; GetCoinTextureString is missing in Forever
+function ns.Money(copper)
+    local g = math.floor(copper / 10000)
+    local s = math.floor(copper / 100) % 100
+    local c = copper % 100
+    local parts = {}
+    if g > 0 then parts[#parts + 1] = "|cffffd700" .. g .. "g|r" end
+    if s > 0 then parts[#parts + 1] = "|cffc7c7cf" .. s .. "s|r" end
+    if c > 0 or #parts == 0 then parts[#parts + 1] = "|cffeda55f" .. c .. "c|r" end
+    return table.concat(parts, " ")
+end
+
+-- C_Item in the modern API; the global as a fallback
+ns.GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 
 function ns.Toggle(key)
     ns.db[key] = not ns.db[key]
@@ -36,15 +64,71 @@ function ns.Toggle(key)
 end
 
 function ns.AnyEnabled()
-    local db = ns.db
-    return db.autoLoot or db.autoQuest or db.autoTurnIn
+    for _, t in ipairs(ns.toggles) do
+        if ns.db[t.key] then return true end
+    end
+    return false
+end
+
+function ns.IsInMenu(toggle)
+    return not ns.db.hidden[toggle.key]
+end
+
+-- A hidden feature is also switched off, so nothing runs that the menu
+-- doesn't show.
+function ns.SetHidden(key, hidden)
+    ns.db.hidden[key] = hidden or nil
+    if hidden then ns.db[key] = false end
+    ns.RefreshUI()
+end
+
+-- The Fast bind row is not a feature, so hiding it switches nothing off.
+-- It shares db.hidden with the toggles under its own key.
+function ns.IsFastBindShown()
+    return not ns.db.hidden.fastBind
+end
+
+function ns.SetFastBindShown(shown)
+    ns.db.hidden.fastBind = not shown or nil
+    ns.RefreshUI()
+end
+
+-- ---------------------------------------------------------------- key bindings
+
+-- Bindings.xml lists one binding per toggle:
+-- Esc > Options > Keybindings > AddOns > QuickToggle.
+BINDING_HEADER_QUICKTOGGLE = L.TITLE
+for _, t in ipairs(ns.toggles) do
+    _G["BINDING_NAME_QUICKTOGGLE_" .. string.upper(t.key)] = L.BINDING_PREFIX .. t.label
+end
+
+function QuickToggle_ToggleFeature(key)
+    if not ns.db then return end
+    -- a feature switched on by key goes back into the menu, so it can be
+    -- seen and switched off there too
+    if ns.db.hidden[key] then ns.SetHidden(key, false) end
+    ns.Toggle(key)
+    for _, t in ipairs(ns.toggles) do
+        if t.key == key then
+            ns.Print(string.format("%s: %s", t.label, ns.db[key] and L.ON or L.OFF))
+        end
+    end
+end
+
+-- Holding Shift skips automation you trigger yourself (loot, NPCs, vendors).
+function ns.Skip()
+    return IsShiftKeyDown()
 end
 
 local function InitDB()
     QuickToggleDB = QuickToggleDB or {}
     local db = QuickToggleDB
     for k, v in pairs(defaults) do
-        if db[k] == nil then db[k] = v end
+        if db[k] == nil then
+            -- table defaults are empty; each save gets its own table
+            if type(v) == "table" then v = {} end
+            db[k] = v
+        end
     end
     -- drop settings left over from older versions
     for k in pairs(db) do
@@ -53,115 +137,36 @@ local function InitDB()
     ns.db = db
 end
 
--- ---------------------------------------------------------------- automation
+-- ---------------------------------------------------------------- events
 
--- Holding Shift skips any automation once.
-local function Skip()
-    return IsShiftKeyDown()
-end
-
-local function LootAll()
-    for i = GetNumLootItems(), 1, -1 do
-        LootSlot(i)
-    end
-end
-
--- NPC with several options (gossip window): open the first finished quest
--- to turn in, otherwise the first new quest to accept. Each accept/turn-in
--- brings the window back, so the next quest gets picked up on the next event.
-local function HandleGossip()
-    local db = ns.db
-    if db.autoTurnIn then
-        for _, q in ipairs(C_GossipInfo.GetActiveQuests()) do
-            if q.isComplete then
-                C_GossipInfo.SelectActiveQuest(q.questID)
-                return
-            end
-        end
-    end
-    if db.autoQuest then
-        local q = C_GossipInfo.GetAvailableQuests()[1]
-        if q then C_GossipInfo.SelectAvailableQuest(q.questID) end
-    end
-end
-
--- Same thing for the older quest-greeting window (quest-only NPCs, boards).
-local function HandleGreeting()
-    local db = ns.db
-    if db.autoTurnIn then
-        for i = 1, GetNumActiveQuests() do
-            local _, isComplete = GetActiveTitle(i)
-            if isComplete then
-                SelectActiveQuest(i)
-                return
-            end
-        end
-    end
-    if db.autoQuest and GetNumAvailableQuests() > 0 then
-        SelectAvailableQuest(1)
-    end
-end
-
+-- Modules subscribe with ns.On(event, fn). Handlers only run once settings
+-- are loaded, so they can use ns.db freely.
 local handlers = {}
-
-function handlers.ADDON_LOADED(name)
-    if name ~= ADDON then return end
-    InitDB()
-    ns.InitUI()
-    return true -- unregister
-end
-
-function handlers.LOOT_OPENED()
-    if ns.db.autoLoot and not Skip() then LootAll() end
-end
-
-function handlers.QUEST_DETAIL()
-    if not ns.db.autoQuest or Skip() then return end
-    -- quests the server already accepted only need the window closed
-    if QuestGetAutoAccept() then
-        CloseQuest()
-    else
-        AcceptQuest()
-    end
-end
-
--- escort quests started by another player
-function handlers.QUEST_ACCEPT_CONFIRM()
-    if not ns.db.autoQuest or Skip() then return end
-    ConfirmAcceptQuest()
-    StaticPopup_Hide("QUEST_ACCEPT")
-end
-
--- "Do you have the items?" page: continue if everything is collected
-function handlers.QUEST_PROGRESS()
-    if ns.db.autoTurnIn and not Skip() and IsQuestCompletable() then
-        CompleteQuest()
-    end
-end
-
--- reward page: take it automatically only when there is nothing to choose
-function handlers.QUEST_COMPLETE()
-    if not ns.db.autoTurnIn or Skip() then return end
-    local choices = GetNumQuestChoices()
-    if choices <= 1 then GetQuestReward(choices) end
-end
-
-function handlers.GOSSIP_SHOW()
-    if not Skip() then HandleGossip() end
-end
-
-function handlers.QUEST_GREETING()
-    if not Skip() then HandleGreeting() end
-end
-
 local events = CreateFrame("Frame")
-for event in pairs(handlers) do
-    events:RegisterEvent(event)
+
+function ns.On(event, fn)
+    if not handlers[event] then
+        handlers[event] = {}
+        events:RegisterEvent(event)
+    end
+    table.insert(handlers[event], fn)
 end
+
+events:RegisterEvent("ADDON_LOADED")
 events:SetScript("OnEvent", function(self, event, ...)
-    -- nothing but ADDON_LOADED may run before settings are loaded
-    if not ns.db and event ~= "ADDON_LOADED" then return end
-    if handlers[event](...) then self:UnregisterEvent(event) end
+    if event == "ADDON_LOADED" then
+        local name = ...
+        if name ~= ADDON then return end
+        InitDB()
+        ns.InitUI()
+        ns.InitOptions()
+        self:UnregisterEvent("ADDON_LOADED")
+        return
+    end
+    if not ns.db then return end
+    for _, fn in ipairs(handlers[event]) do
+        fn(...)
+    end
 end)
 
 -- ---------------------------------------------------------------- slash
@@ -178,6 +183,8 @@ SlashCmdList.QUICKTOGGLE = function(msg)
     elseif msg == "reset" then
         ns.ResetPosition()
         ns.Print(L.RESET)
+    elseif msg == "options" or msg == "config" then
+        ns.OpenOptions()
     elseif msg == "help" then
         ns.Print(L.HELP)
     else

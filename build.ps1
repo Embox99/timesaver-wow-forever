@@ -6,7 +6,13 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 $addon = "QuickToggle"
 # files that ship in the zip; keep in sync with the ignore list in .pkgmeta
-$files = @("QuickToggle.toc", "Locales.lua", "Core.lua", "UI.lua", "LICENSE", "CHANGELOG.md")
+$files = @(
+    "QuickToggle.toc", "Bindings.xml",
+    "Locales.lua", "Core.lua", "Quests.lua", "Vendor.lua", "Mail.lua",
+    "Social.lua", "UI.lua", "Options.lua", "Broker.lua",
+    "Media\icon.tga",
+    "LICENSE", "CHANGELOG.md"
+)
 
 # same version the packager would use: latest tag, or "dev" without tags
 $version = (git -C $root describe --tags --always 2>$null)
@@ -20,7 +26,11 @@ if (Test-Path $stage) { Remove-Item -Recurse -Force -Confirm:$false $stage }
 if (Test-Path $zip) { Remove-Item -Force -Confirm:$false $zip }
 New-Item -ItemType Directory -Force $stage | Out-Null
 
-foreach ($f in $files) { Copy-Item (Join-Path $root $f) $stage }
+foreach ($f in $files) {
+    $dest = Join-Path $stage $f
+    New-Item -ItemType Directory -Force (Split-Path $dest -Parent) | Out-Null
+    Copy-Item (Join-Path $root $f) $dest
+}
 
 $toc = Join-Path $stage "$addon.toc"
 $text = [IO.File]::ReadAllText($toc).Replace("@project-version@", $version)
@@ -31,8 +41,9 @@ $text = [IO.File]::ReadAllText($toc).Replace("@project-version@", $version)
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $archive = [System.IO.Compression.ZipFile]::Open($zip, "Create")
 try {
-    Get-ChildItem $stage -File | ForEach-Object {
-        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $_.FullName, "$addon/$($_.Name)") | Out-Null
+    Get-ChildItem $stage -File -Recurse | ForEach-Object {
+        $entry = "$addon/" + $_.FullName.Substring($stage.Length + 1).Replace("\", "/")
+        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $_.FullName, $entry) | Out-Null
     }
 } finally {
     $archive.Dispose()

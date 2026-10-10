@@ -1,0 +1,38 @@
+<Bindings>
+    <!-- Esc > Options > Keybindings > AddOns > QuickToggle.
+         Names come from BINDING_NAME_* globals in Core.lua.
+         The header goes on the first binding only. -->
+    <Binding name="QUICKTOGGLE_AUTOLOOT" header="QUICKTOGGLE" category="ADDONS">
+        QuickToggle_ToggleFeature("autoLoot")
+    </Binding>
+    <Binding name="QUICKTOGGLE_AUTOQUEST" category="ADDONS">
+        QuickToggle_ToggleFeature("autoQuest")
+    </Binding>
+    <Binding name="QUICKTOGGLE_AUTOTURNIN" category="ADDONS">
+        QuickToggle_ToggleFeature("autoTurnIn")
+    </Binding>
+    <Binding name="QUICKTOGGLE_BESTREWARD" category="ADDONS">
+        QuickToggle_ToggleFeature("bestReward")
+    </Binding>
+    <Binding name="QUICKTOGGLE_SELLJUNK" category="ADDONS">
+        QuickToggle_ToggleFeature("sellJunk")
+    </Binding>
+    <Binding name="QUICKTOGGLE_AUTOREPAIR" category="ADDONS">
+        QuickToggle_ToggleFeature("autoRepair")
+    </Binding>
+    <Binding name="QUICKTOGGLE_MAILTAKEALL" category="ADDONS">
+        QuickToggle_ToggleFeature("mailTakeAll")
+    </Binding>
+    <Binding name="QUICKTOGGLE_ACCEPTINVITES" category="ADDONS">
+        QuickToggle_ToggleFeature("acceptInvites")
+    </Binding>
+    <Binding name="QUICKTOGGLE_DECLINEDUELS" category="ADDONS">
+        QuickToggle_ToggleFeature("declineDuels")
+    </Binding>
+    <Binding name="QUICKTOGGLE_DECLINEGUILD" category="ADDONS">
+        QuickToggle_ToggleFeature("declineGuild")
+    </Binding>
+    <Binding name="QUICKTOGGLE_DECLINETRADES" category="ADDONS">
+        QuickToggle_ToggleFeature("declineTrades")
+    </Binding>
+</Bindings>
