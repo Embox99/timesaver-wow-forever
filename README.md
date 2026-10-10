@@ -62,7 +62,3 @@ English, Russian.
 - Releases: update `CHANGELOG.md`, then push an annotated tag
   (`git tag -a v1.0.1 -m "v1.0.1"` and `git push --tags`). GitHub Actions runs
   the BigWigs packager, which uploads the zip to CurseForge and GitHub Releases.
-
-## License
-
-MIT

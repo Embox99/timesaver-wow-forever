@@ -9,7 +9,6 @@
 ## Category-ruRU: Задания и развитие
 ## IconTexture: Interface\AddOns\QuickToggle\Media\icon
 ## SavedVariables: QuickToggleDB
-## X-License: MIT
 
 Locales.lua
 Core.lua

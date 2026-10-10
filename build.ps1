@@ -11,7 +11,7 @@ $files = @(
     "Locales.lua", "Core.lua", "Quests.lua", "Vendor.lua", "Mail.lua",
     "Social.lua", "UI.lua", "Options.lua", "Broker.lua",
     "Media\icon.tga",
-    "LICENSE", "CHANGELOG.md"
+    "CHANGELOG.md"
 )
 
 # same version the packager would use: latest tag, or "dev" without tags
