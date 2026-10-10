@@ -1,6 +1,8 @@
 # Local build: packs the addon into dist\Timesaver-<version>.zip.
 # Releases to CurseForge are built by GitHub Actions (.github\workflows\release.yml);
 # this script is for testing the same package by hand.
+#   powershell -File build.ps1 -Version 1.0.0   (default: latest git tag)
+param([string]$Version)
 $ErrorActionPreference = "Stop"
 
 $root = $PSScriptRoot
@@ -15,7 +17,8 @@ $files = @(
 )
 
 # same version the packager would use: latest tag, or "dev" without tags
-$version = (git -C $root describe --tags --always 2>$null)
+$version = $Version
+if (-not $version) { $version = (git -C $root describe --tags --always 2>$null) }
 if (-not $version) { $version = "dev" }
 
 $dist = Join-Path $root "dist"
