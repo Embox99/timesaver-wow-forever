@@ -1,38 +1,38 @@
 <Bindings>
-    <!-- Esc > Options > Keybindings > AddOns > QuickToggle.
+    <!-- Esc > Options > Keybindings > AddOns > Timesaver.
          Names come from BINDING_NAME_* globals in Core.lua.
          The header goes on the first binding only. -->
-    <Binding name="QUICKTOGGLE_AUTOLOOT" header="QUICKTOGGLE" category="ADDONS">
-        QuickToggle_ToggleFeature("autoLoot")
+    <Binding name="TIMESAVER_AUTOLOOT" header="TIMESAVER" category="ADDONS">
+        Timesaver_ToggleFeature("autoLoot")
     </Binding>
-    <Binding name="QUICKTOGGLE_AUTOQUEST" category="ADDONS">
-        QuickToggle_ToggleFeature("autoQuest")
+    <Binding name="TIMESAVER_AUTOQUEST" category="ADDONS">
+        Timesaver_ToggleFeature("autoQuest")
     </Binding>
-    <Binding name="QUICKTOGGLE_AUTOTURNIN" category="ADDONS">
-        QuickToggle_ToggleFeature("autoTurnIn")
+    <Binding name="TIMESAVER_AUTOTURNIN" category="ADDONS">
+        Timesaver_ToggleFeature("autoTurnIn")
     </Binding>
-    <Binding name="QUICKTOGGLE_BESTREWARD" category="ADDONS">
-        QuickToggle_ToggleFeature("bestReward")
+    <Binding name="TIMESAVER_BESTREWARD" category="ADDONS">
+        Timesaver_ToggleFeature("bestReward")
     </Binding>
-    <Binding name="QUICKTOGGLE_SELLJUNK" category="ADDONS">
-        QuickToggle_ToggleFeature("sellJunk")
+    <Binding name="TIMESAVER_SELLJUNK" category="ADDONS">
+        Timesaver_ToggleFeature("sellJunk")
     </Binding>
-    <Binding name="QUICKTOGGLE_AUTOREPAIR" category="ADDONS">
-        QuickToggle_ToggleFeature("autoRepair")
+    <Binding name="TIMESAVER_AUTOREPAIR" category="ADDONS">
+        Timesaver_ToggleFeature("autoRepair")
     </Binding>
-    <Binding name="QUICKTOGGLE_MAILTAKEALL" category="ADDONS">
-        QuickToggle_ToggleFeature("mailTakeAll")
+    <Binding name="TIMESAVER_MAILTAKEALL" category="ADDONS">
+        Timesaver_ToggleFeature("mailTakeAll")
     </Binding>
-    <Binding name="QUICKTOGGLE_ACCEPTINVITES" category="ADDONS">
-        QuickToggle_ToggleFeature("acceptInvites")
+    <Binding name="TIMESAVER_ACCEPTINVITES" category="ADDONS">
+        Timesaver_ToggleFeature("acceptInvites")
     </Binding>
-    <Binding name="QUICKTOGGLE_DECLINEDUELS" category="ADDONS">
-        QuickToggle_ToggleFeature("declineDuels")
+    <Binding name="TIMESAVER_DECLINEDUELS" category="ADDONS">
+        Timesaver_ToggleFeature("declineDuels")
     </Binding>
-    <Binding name="QUICKTOGGLE_DECLINEGUILD" category="ADDONS">
-        QuickToggle_ToggleFeature("declineGuild")
+    <Binding name="TIMESAVER_DECLINEGUILD" category="ADDONS">
+        Timesaver_ToggleFeature("declineGuild")
     </Binding>
-    <Binding name="QUICKTOGGLE_DECLINETRADES" category="ADDONS">
-        QuickToggle_ToggleFeature("declineTrades")
+    <Binding name="TIMESAVER_DECLINETRADES" category="ADDONS">
+        Timesaver_ToggleFeature("declineTrades")
     </Binding>
 </Bindings>

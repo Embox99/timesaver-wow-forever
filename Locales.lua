@@ -1,7 +1,7 @@
 local _, ns = ...
 
 local L = {
-    TITLE = "QuickToggle",
+    TITLE = "Timesaver",
     SETTINGS = "Settings",
 
     AUTO_LOOT = "Auto loot",
@@ -35,7 +35,7 @@ local L = {
     SECTION_MENU = "Show in clock menu",
     SECTION_ICON = "Clock icon",
     DESC_MENU = "List this feature in the clock menu. Hiding a feature also switches it off.",
-    DESC_SHOW_ICON = "Hide it if you use the Titan Panel button. /qt brings it back.",
+    DESC_SHOW_ICON = "Hide it if you use the Titan Panel button. /tsv brings it back.",
     DESC = {
         autoLoot = "Loot everything when the loot window opens. Hold Shift to loot manually.",
         autoQuest = "Accept quests from NPCs, quest boards and escort quests. Hold Shift to read the quest first.",
@@ -70,7 +70,7 @@ local L = {
     LOCKED = "icon locked",
     UNLOCKED = "icon unlocked",
     RESET = "position reset",
-    HELP = "/qt - show/hide icon,  /qt options - settings,  /qt lock - lock position,  /qt reset - reset position",
+    HELP = "/tsv - show/hide icon,  /tsv options - settings,  /tsv lock - lock position,  /tsv reset - reset position",
 }
 
 if GetLocale() == "ruRU" then
@@ -106,7 +106,7 @@ if GetLocale() == "ruRU" then
     L.SECTION_MENU = "Показывать в меню часов"
     L.SECTION_ICON = "Иконка часов"
     L.DESC_MENU = "Показывать функцию в меню часов. Скрытая функция заодно выключается."
-    L.DESC_SHOW_ICON = "Можно скрыть, если пользуешься кнопкой в Titan Panel. Вернуть: /qt"
+    L.DESC_SHOW_ICON = "Можно скрыть, если пользуешься кнопкой в Titan Panel. Вернуть: /tsv"
     L.DESC = {
         autoLoot = "Забирать всю добычу при открытии окна лута. Shift: лутать вручную.",
         autoQuest = "Принимать квесты у НПС, с досок объявлений и сопровождения. Shift: сначала прочитать.",
@@ -141,7 +141,7 @@ if GetLocale() == "ruRU" then
     L.LOCKED = "иконка закреплена"
     L.UNLOCKED = "иконка откреплена"
     L.RESET = "позиция сброшена"
-    L.HELP = "/qt - показать/скрыть,  /qt options - настройки,  /qt lock - закрепить,  /qt reset - сбросить позицию"
+    L.HELP = "/tsv - показать/скрыть,  /tsv options - настройки,  /tsv lock - закрепить,  /tsv reset - сбросить позицию"
 end
 
 ns.L = L

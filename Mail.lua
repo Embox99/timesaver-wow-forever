@@ -63,7 +63,7 @@ local function Step()
 end
 
 local function CreateButton()
-    button = CreateFrame("Button", "QuickToggleMailButton", InboxFrame, "UIPanelButtonTemplate")
+    button = CreateFrame("Button", "TimesaverMailButton", InboxFrame, "UIPanelButtonTemplate")
     button:SetSize(110, 22)
     button:SetText(L.MAIL_BUTTON)
     button:SetPoint("TOPRIGHT", MailFrame, "TOPRIGHT", -12, -30)

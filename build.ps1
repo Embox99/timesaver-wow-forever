@@ -1,13 +1,13 @@
-# Local build: packs the addon into dist\QuickToggle-<version>.zip.
+# Local build: packs the addon into dist\Timesaver-<version>.zip.
 # Releases to CurseForge are built by GitHub Actions (.github\workflows\release.yml);
 # this script is for testing the same package by hand.
 $ErrorActionPreference = "Stop"
 
 $root = $PSScriptRoot
-$addon = "QuickToggle"
+$addon = "Timesaver"
 # files that ship in the zip; keep in sync with the ignore list in .pkgmeta
 $files = @(
-    "QuickToggle.toc", "Bindings.xml",
+    "Timesaver.toc", "Bindings.xml",
     "Locales.lua", "Core.lua", "Quests.lua", "Vendor.lua", "Mail.lua",
     "Social.lua", "UI.lua", "Options.lua", "Broker.lua",
     "Media\icon.tga",

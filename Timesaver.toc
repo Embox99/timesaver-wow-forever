@@ -1,14 +1,14 @@
 ## Interface: 16001
-## Title: QuickToggle
-## Title-ruRU: QuickToggle
+## Title: Timesaver
+## Title-ruRU: Timesaver
 ## Notes: One small clock icon for quality-of-life automation: loot, quests, vendors, invites.
 ## Notes-ruRU: Маленькая иконка часов: автолут, квесты, торговцы, приглашения.
 ## Author: embox
 ## Version: @project-version@
 ## Category: Quests & Leveling
 ## Category-ruRU: Задания и развитие
-## IconTexture: Interface\AddOns\QuickToggle\Media\icon
-## SavedVariables: QuickToggleDB
+## IconTexture: Interface\AddOns\Timesaver\Media\icon
+## SavedVariables: TimesaverDB
 
 Locales.lua
 Core.lua

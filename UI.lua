@@ -61,7 +61,7 @@ end
 -- ---------------------------------------------------------------- clock
 
 local function CreateClock()
-    local f = CreateFrame("Button", "QuickToggleIcon", UIParent)
+    local f = CreateFrame("Button", "TimesaverIcon", UIParent)
     f:SetFrameStrata("MEDIUM")
     f:SetClampedToScreen(true)
     f:SetMovable(true)
@@ -395,7 +395,7 @@ end
 -- ---------------------------------------------------------------- popups
 
 local function CreateToggleMenu()
-    local f = CreatePopup("QuickToggleMenu", L.TITLE)
+    local f = CreatePopup("TimesaverMenu", L.TITLE)
     for _, t in ipairs(ns.toggles) do
         CreateToggleRow(f, t.label,
             function() return ns.db[t.key] end,
@@ -411,7 +411,7 @@ local function CreateToggleMenu()
 end
 
 local function CreateSettingsMenu()
-    local f = CreatePopup("QuickToggleSettings", L.SETTINGS)
+    local f = CreatePopup("TimesaverSettings", L.SETTINGS)
     CreateStepperRow(f, L.ICON_SIZE, "size", 16, 40, 2, "%d px")
     CreateStepperRow(f, L.OPACITY, "alpha", 30, 100, 10, "%d%%")
     CreateSettingRow(f, L.SHOW_ICON, "shown")

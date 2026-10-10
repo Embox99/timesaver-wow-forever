@@ -96,13 +96,13 @@ end
 -- ---------------------------------------------------------------- key bindings
 
 -- Bindings.xml lists one binding per toggle:
--- Esc > Options > Keybindings > AddOns > QuickToggle.
-BINDING_HEADER_QUICKTOGGLE = L.TITLE
+-- Esc > Options > Keybindings > AddOns > Timesaver.
+BINDING_HEADER_TIMESAVER = L.TITLE
 for _, t in ipairs(ns.toggles) do
-    _G["BINDING_NAME_QUICKTOGGLE_" .. string.upper(t.key)] = L.BINDING_PREFIX .. t.label
+    _G["BINDING_NAME_TIMESAVER_" .. string.upper(t.key)] = L.BINDING_PREFIX .. t.label
 end
 
-function QuickToggle_ToggleFeature(key)
+function Timesaver_ToggleFeature(key)
     if not ns.db then return end
     -- a feature switched on by key goes back into the menu, so it can be
     -- seen and switched off there too
@@ -121,8 +121,8 @@ function ns.Skip()
 end
 
 local function InitDB()
-    QuickToggleDB = QuickToggleDB or {}
-    local db = QuickToggleDB
+    TimesaverDB = TimesaverDB or {}
+    local db = TimesaverDB
     for k, v in pairs(defaults) do
         if db[k] == nil then
             -- table defaults are empty; each save gets its own table
@@ -171,9 +171,9 @@ end)
 
 -- ---------------------------------------------------------------- slash
 
-SLASH_QUICKTOGGLE1 = "/qt"
-SLASH_QUICKTOGGLE2 = "/quicktoggle"
-SlashCmdList.QUICKTOGGLE = function(msg)
+SLASH_TIMESAVER1 = "/tsv"
+SLASH_TIMESAVER2 = "/timesaver"
+SlashCmdList.TIMESAVER = function(msg)
     msg = strtrim(string.lower(msg or ""))
     local db = ns.db
     if msg == "lock" then

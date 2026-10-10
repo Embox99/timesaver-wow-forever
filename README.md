@@ -1,4 +1,4 @@
-# QuickToggle
+# Timesaver
 
 One small clock icon for **World of Warcraft: Forever** (interface 16001)
 that switches everyday chores on and off: looting, quests, vendors, mail and
@@ -33,20 +33,20 @@ automation once. Every feature is off until you switch it on.
 
 Also available:
 
-- **Options page:** Esc > Options > AddOns > QuickToggle.
+- **Options page:** Esc > Options > AddOns > Timesaver.
 - **Key bindings** for every feature: Esc > Options > Keybindings > AddOns.
-- **Titan Panel** (and other LibDataBroker displays): a QuickToggle button
+- **Titan Panel** (and other LibDataBroker displays): a Timesaver button
   with the same menus; the floating clock can then be hidden.
 
 ## Commands
 
 | Command | Action |
 |---|---|
-| `/qt` | Show or hide the clock icon |
-| `/qt options` | Open the options page |
-| `/qt lock` | Lock or unlock the icon position |
-| `/qt reset` | Move the icon back to the center of the screen |
-| `/qt help` | Print the command list |
+| `/tsv` | Show or hide the clock icon |
+| `/tsv options` | Open the options page |
+| `/tsv lock` | Lock or unlock the icon position |
+| `/tsv reset` | Move the icon back to the center of the screen |
+| `/tsv help` | Print the command list |
 
 ## Languages
 
@@ -56,9 +56,9 @@ English, Russian.
 
 - The repository root is the addon folder. For local testing, link it into
   the game (adjust the game path):
-  `mklink /J "<WoW>\_forever_beta_\Interface\AddOns\QuickToggle" "<this repo>"`
+  `mklink /J "<WoW>\_forever_beta_\Interface\AddOns\Timesaver" "<this repo>"`
 - `tools\render-icon.ps1` redraws the clock texture `Media\icon.tga`.
-- `build.ps1` builds `dist\QuickToggle-<version>.zip` locally.
+- `build.ps1` builds `dist\Timesaver-<version>.zip` locally.
 - Releases: update `CHANGELOG.md`, then push an annotated tag
   (`git tag -a v1.0.1 -m "v1.0.1"` and `git push --tags`). GitHub Actions runs
   the BigWigs packager, which uploads the zip to CurseForge and GitHub Releases.

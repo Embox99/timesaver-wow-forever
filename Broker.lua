@@ -8,7 +8,7 @@ ns.On("PLAYER_LOGIN", function()
     local LDB = LibStub and LibStub("LibDataBroker-1.1", true)
     if not LDB then return end
 
-    LDB:NewDataObject("QuickToggle", {
+    LDB:NewDataObject("Timesaver", {
         type = "launcher",
         label = L.TITLE,
         icon = ns.ICON,

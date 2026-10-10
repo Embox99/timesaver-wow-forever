@@ -1,4 +1,4 @@
--- Page in the game's own options: Esc > Options > AddOns > QuickToggle.
+-- Page in the game's own options: Esc > Options > AddOns > Timesaver.
 -- Built from the same settings as the clock menus; every change goes through
 -- the same functions, so both stay in sync.
 local _, ns = ...
@@ -7,7 +7,7 @@ local L = ns.L
 local category
 
 local function Var(id)
-    return "QuickToggle_" .. id
+    return "Timesaver_" .. id
 end
 
 local function AddCheckbox(cat, id, name, tooltip, default, get, set)
@@ -74,7 +74,7 @@ function ns.InitOptions()
     category = cat
 end
 
--- the game's key binding screen (the QuickToggle section is under AddOns)
+-- the game's key binding screen (the Timesaver section is under AddOns)
 function ns.OpenKeybindings()
     if Settings and Settings.KEYBINDINGS_CATEGORY_ID then
         Settings.OpenToCategory(Settings.KEYBINDINGS_CATEGORY_ID)
