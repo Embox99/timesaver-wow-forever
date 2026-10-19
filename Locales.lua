@@ -33,14 +33,7 @@ local L = {
     MENU_ITEMS = "Show in menu:",
     ALL_SETTINGS = "All settings...",
     KEYBINDINGS = "Fast bind",
-    ALL_KEYBINDINGS = "All key bindings...",
-    PRESS_KEY = "press a key...",
-    NOT_BOUND = "-",
-    BIND_HINT = "Click a feature, press a key. Esc: cancel, Del: remove",
-    BIND_SET = "%s: key %s",
-    BIND_CLEARED = "%s: key removed",
-    BIND_REPLACED = "%s was used for \"%s\" - reassigned",
-    DESC_FAST_BIND = "Show the Fast bind row at the bottom of the clock menu: assign keys to features right there.",
+    DESC_FAST_BIND = "Show the Fast bind row at the bottom of the clock menu: it opens the game's Quick Keybind Mode.",
     RESET_BUTTON = "Reset",
 
     -- options page (Esc > Options > AddOns)
@@ -137,14 +130,7 @@ if GetLocale() == "ruRU" then
     L.MENU_ITEMS = "Показывать в меню:"
     L.ALL_SETTINGS = "Все настройки..."
     L.KEYBINDINGS = "Fast bind"
-    L.ALL_KEYBINDINGS = "Все клавиши..."
-    L.PRESS_KEY = "нажми клавишу..."
-    L.NOT_BOUND = "-"
-    L.BIND_HINT = "Клик по функции, затем клавиша. Esc: отмена, Del: убрать"
-    L.BIND_SET = "%s: клавиша %s"
-    L.BIND_CLEARED = "%s: клавиша убрана"
-    L.BIND_REPLACED = "%s была назначена на «%s» - переназначена"
-    L.DESC_FAST_BIND = "Показывать внизу меню часов строку Fast bind: назначать клавиши функциям прямо там."
+    L.DESC_FAST_BIND = "Показывать внизу меню часов строку Fast bind: открывает режим быстрого назначения клавиш игры."
     L.RESET_BUTTON = "Сбросить"
 
     L.SECTION_FEATURES = "Функции"

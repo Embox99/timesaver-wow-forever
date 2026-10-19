@@ -102,6 +102,21 @@ function ns.NotifyOptions()
     end
 end
 
+-- The game's Quick Keybind Mode: hover a button, press a key. Its frame
+-- lives in a load-on-demand part of the UI in some clients; without it,
+-- the regular key binding screen opens instead.
+function ns.OpenQuickKeybind()
+    if not ns.CanOpenWindows() then return end
+    if not QuickKeybindFrame and C_AddOns and C_AddOns.LoadAddOn then
+        pcall(C_AddOns.LoadAddOn, "Blizzard_QuickKeybind")
+    end
+    if QuickKeybindFrame then
+        ShowUIPanel(QuickKeybindFrame)
+    else
+        ns.OpenKeybindings()
+    end
+end
+
 -- the game's key binding screen (the Timesaver section is under AddOns)
 function ns.OpenKeybindings()
     if not ns.CanOpenWindows() then return end

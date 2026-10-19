@@ -36,11 +36,10 @@ local ROW_HEIGHT = 22
 local SMALL_ROW_HEIGHT = 18
 local CAPTION_HEIGHT = 24
 local DIVIDER_HEIGHT = 9
-local HINT_HEIGHT = 30
 local ROW_ICON = 16
 local SMALL_ROW_ICON = 14
 
-local clock, menu, settings, bindMenu
+local clock, menu, settings
 local popups = {}   -- only one popup is open at a time
 local painted = {}  -- rows repainted by ns.RefreshUI
 
@@ -431,154 +430,11 @@ local function CreateToggleMenu()
     end
     CreateDivider(f, ns.IsFastBindShown)
     CreateActionRow(f, L.KEYBINDINGS, function()
-        if not ns.CanOpenWindows() then return end
-        ns.TogglePopup("bind", f.anchor or clock)
+        f:Hide()
+        ns.OpenQuickKeybind()
     end, { icon = KEYS_ICON, isVisible = ns.IsFastBindShown })
     return f
 end
-
--- ---------------------------------------------------------------- fast bind
-
--- Fast bind: click a feature, press a key, done. Esc cancels, Delete or
--- Backspace removes the key. The key is saved in the game's own bindings,
--- so it also shows on the game's key binding screen.
-local capturing -- the toggle waiting for a key, or nil
-
-local MODIFIER_KEYS = {
-    LSHIFT = true, RSHIFT = true, LCTRL = true, RCTRL = true,
-    LALT = true, RALT = true, LMETA = true, RMETA = true,
-}
-
-local function BindingName(t)
-    return "TIMESAVER_" .. string.upper(t.key)
-end
-
-local function KeyLabel(key)
-    return GetBindingText and GetBindingText(key) or key
-end
-
-local function StopCapture()
-    capturing = nil
-    if bindMenu then bindMenu:EnableKeyboard(false) end
-    ns.RefreshUI()
-end
-
--- key = nil removes the feature's key
-local function ApplyKey(key)
-    local t = capturing
-    local command = BindingName(t)
-    if key then
-        local old = GetBindingAction(key)
-        if old and old ~= "" and old ~= command then
-            ns.Print(string.format(L.BIND_REPLACED, KeyLabel(key), _G["BINDING_NAME_" .. old] or old))
-        end
-    end
-    -- one key per feature: drop the ones it had before
-    for _, oldKey in ipairs({ GetBindingKey(command) }) do
-        SetBinding(oldKey)
-    end
-    if key then SetBinding(key, command) end
-    SaveBindings(GetCurrentBindingSet())
-    if key then
-        ns.Print(string.format(L.BIND_SET, t.label, KeyLabel(key)))
-    else
-        ns.Print(string.format(L.BIND_CLEARED, t.label))
-    end
-    StopCapture()
-end
-
-local function OnCaptureKey(_, key)
-    if not capturing then return end
-    if key == "ESCAPE" then
-        StopCapture()
-    elseif key == "BACKSPACE" or key == "DELETE" then
-        ApplyKey(nil)
-    elseif not MODIFIER_KEYS[key] then
-        local prefix = (IsAltKeyDown() and "ALT-" or "")
-            .. (IsControlKeyDown() and "CTRL-" or "")
-            .. (IsShiftKeyDown() and "SHIFT-" or "")
-        ApplyKey(prefix .. key)
-    end
-end
-
--- [icon] Label ......... Ctrl-L
-local function CreateKeyRow(f, t)
-    local row = CreateRow(f, true, { icon = t.icon, isVisible = function() return ns.IsInMenu(t) end })
-    row.label:SetText(t.label)
-    row.key = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.key:SetPoint("RIGHT", -PAD_X, 0)
-
-    function row.Paint()
-        if capturing == t then
-            row.label:SetTextColor(TITLE_COLOR[1], TITLE_COLOR[2], TITLE_COLOR[3])
-            row.key:SetText(L.PRESS_KEY)
-            row.key:SetTextColor(TITLE_COLOR[1], TITLE_COLOR[2], TITLE_COLOR[3])
-            return
-        end
-        row.label:SetTextColor(TEXT_ON[1], TEXT_ON[2], TEXT_ON[3])
-        local key = GetBindingKey(BindingName(t))
-        if key then
-            row.key:SetText(KeyLabel(key))
-            row.key:SetTextColor(TEXT_ON[1], TEXT_ON[2], TEXT_ON[3])
-        else
-            row.key:SetText(L.NOT_BOUND)
-            row.key:SetTextColor(TEXT_OFF[1], TEXT_OFF[2], TEXT_OFF[3])
-        end
-    end
-
-    row:SetScript("OnClick", function()
-        if not ns.CanOpenWindows() then return end
-        capturing = t
-        bindMenu:EnableKeyboard(true)
-        bindMenu:SetPropagateKeyboardInput(false)
-        ns.RefreshUI()
-    end)
-    painted[#painted + 1] = row
-    return row
-end
-
--- small grey text, up to two lines
-local function CreateHint(f, text)
-    local row = CreateFrame("Frame", nil, f)
-    AddItem(f, row, HINT_HEIGHT)
-    local label = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    label:SetPoint("TOPLEFT", PAD_X, -2)
-    label:SetPoint("BOTTOMRIGHT", -PAD_X, 2)
-    label:SetJustifyH("LEFT")
-    label:SetJustifyV("MIDDLE")
-    label:SetWordWrap(true)
-    label:SetText(text)
-    return row
-end
-
-local function CreateBindMenu()
-    local f = CreatePopup("TimesaverFastBind", L.KEYBINDINGS)
-    for _, t in ipairs(ns.toggles) do
-        CreateKeyRow(f, t)
-    end
-    CreateDivider(f)
-    CreateHint(f, L.BIND_HINT)
-    CreateActionRow(f, L.ALL_KEYBINDINGS, function()
-        f:Hide()
-        ns.OpenKeybindings()
-    end, { icon = KEYS_ICON })
-
-    f:SetScript("OnKeyDown", OnCaptureKey)
-    -- closing the window (click outside, another menu) cancels a capture
-    f:HookScript("OnHide", function()
-        if capturing then StopCapture() end
-    end)
-    return f
-end
-
--- key bindings can't change in combat; also refresh when they change elsewhere
-ns.On("PLAYER_REGEN_DISABLED", function()
-    if capturing then StopCapture() end
-    if bindMenu then bindMenu:Hide() end
-end)
-ns.On("UPDATE_BINDINGS", function()
-    if bindMenu and bindMenu:IsShown() then ns.RefreshUI() end
-end)
 
 local function CreateSettingsMenu()
     local f = CreatePopup("TimesaverSettings", L.SETTINGS)
@@ -669,15 +525,14 @@ function ns.InitUI()
     clock = CreateClock()
     menu = CreateToggleMenu()
     settings = CreateSettingsMenu()
-    bindMenu = CreateBindMenu()
     SetupClockScripts()
     ApplyPosition()
     ns.RefreshUI()
 end
 
--- which: "menu", "settings" or "bind"; anchor: the button that was clicked
+-- which: "menu" or "settings"; anchor: the button that was clicked
 function ns.TogglePopup(which, anchor)
-    local f = (which == "settings" and settings) or (which == "bind" and bindMenu) or menu
+    local f = which == "settings" and settings or menu
     if f:IsShown() and f.anchor == anchor then
         f:Hide()
         return
