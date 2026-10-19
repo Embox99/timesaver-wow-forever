@@ -1,4 +1,5 @@
--- Auto loot, auto accept and auto turn in of quests, best reward choice.
+-- Auto loot, auto accept and auto turn in of quests, best reward choice,
+-- skipping grey quests and single-option NPC chatter.
 local _, ns = ...
 local L = ns.L
 
@@ -9,10 +10,20 @@ ns.On("LOOT_OPENED", function()
     end
 end)
 
+-- Grey quests: too low for your level, they give no experience.
+local function IsTrivial(questID)
+    if not ns.db.skipTrivial or not questID then return false end
+    if C_QuestLog and C_QuestLog.IsQuestTrivial then
+        return C_QuestLog.IsQuestTrivial(questID) and true or false
+    end
+    return false
+end
+
 ns.On("QUEST_DETAIL", function()
     if not ns.db.autoQuest or ns.Skip() then return end
+    if GetQuestID and IsTrivial(GetQuestID()) then return end
     -- quests the server already accepted only need the window closed
-    if QuestGetAutoAccept() then
+    if QuestGetAutoAccept and QuestGetAutoAccept() then
         CloseQuest()
     else
         AcceptQuest()
@@ -83,6 +94,33 @@ ns.On("QUEST_FINISHED", function()
     rewardPageOpen = false
 end)
 
+-- session statistics: every quest counts, taken by hand or automatically
+ns.On("QUEST_ACCEPTED", function()
+    ns.stats.accepted = ns.stats.accepted + 1
+end)
+
+ns.On("QUEST_TURNED_IN", function()
+    ns.stats.turnedIn = ns.stats.turnedIn + 1
+end)
+
+-- NPC with nothing but a single dialogue option (flight master, innkeeper):
+-- pick it. Picking the same option again within 3 s means the NPC loops
+-- back to the same page, so it is left to you then.
+local lastOption, lastOptionTime = nil, 0
+
+local function SkipGossip()
+    if #C_GossipInfo.GetActiveQuests() > 0 or #C_GossipInfo.GetAvailableQuests() > 0 then
+        return
+    end
+    local options = C_GossipInfo.GetOptions()
+    if #options ~= 1 then return end
+    local id = options[1].gossipOptionID
+    if not id then return end
+    if id == lastOption and GetTime() - lastOptionTime < 3 then return end
+    lastOption, lastOptionTime = id, GetTime()
+    C_GossipInfo.SelectOption(id)
+end
+
 -- NPC with several options (gossip window): open the first finished quest
 -- to turn in, otherwise the first new quest to accept. Each accept/turn-in
 -- brings the window back, so the next quest gets picked up on the next event.
@@ -98,9 +136,14 @@ ns.On("GOSSIP_SHOW", function()
         end
     end
     if db.autoQuest then
-        local q = C_GossipInfo.GetAvailableQuests()[1]
-        if q then C_GossipInfo.SelectAvailableQuest(q.questID) end
+        for _, q in ipairs(C_GossipInfo.GetAvailableQuests()) do
+            if not (db.skipTrivial and q.isTrivial) then
+                C_GossipInfo.SelectAvailableQuest(q.questID)
+                return
+            end
+        end
     end
+    if db.skipGossip then SkipGossip() end
 end)
 
 -- Same thing for the older quest-greeting window (quest-only NPCs, boards).
@@ -116,7 +159,13 @@ ns.On("QUEST_GREETING", function()
             end
         end
     end
-    if db.autoQuest and GetNumAvailableQuests() > 0 then
-        SelectAvailableQuest(1)
+    if db.autoQuest then
+        for i = 1, GetNumAvailableQuests() do
+            local isTrivial = GetAvailableQuestInfo and GetAvailableQuestInfo(i)
+            if not (db.skipTrivial and isTrivial) then
+                SelectAvailableQuest(i)
+                return
+            end
+        end
     end
 end)

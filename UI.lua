@@ -1,5 +1,6 @@
 -- Round clock icon, the toggle menu (left click) and the settings menu (right click).
--- Both menus can also be opened from a Titan Panel / LDB button (Broker.lua).
+-- Both menus can also be opened from the minimap button (Minimap.lua) and a
+-- Titan Panel / LDB button (Broker.lua).
 -- Menu style: flat dark panel, an icon per feature, a glowing dot for "on".
 local ADDON, ns = ...
 local L = ns.L
@@ -106,18 +107,43 @@ local function PaintClock()
 end
 
 -- shared by the clock and the Titan/LDB button
+-- shown only from a packaged build; a dev checkout has the "@...@" token
+local function VersionText()
+    if ns.VERSION == "" or string.find(ns.VERSION, "@", 1, true) then return "" end
+    return "  |cff888888" .. ns.VERSION .. "|r"
+end
+
+local function AddStats(tooltip)
+    local s = ns.stats
+    if s.accepted + s.turnedIn + s.junk + s.repairs == 0 then return end
+    tooltip:AddLine(" ")
+    tooltip:AddLine(L.STATS_TITLE, TITLE_COLOR[1], TITLE_COLOR[2], TITLE_COLOR[3])
+    if s.accepted + s.turnedIn > 0 then
+        tooltip:AddDoubleLine(L.STATS_QUESTS, s.accepted .. " / " .. s.turnedIn,
+            1, 1, 1, 1, 1, 1)
+    end
+    if s.junk > 0 then
+        tooltip:AddDoubleLine(L.STATS_JUNK, ns.Money(s.junk), 1, 1, 1, 1, 1, 1)
+    end
+    if s.repairs > 0 then
+        tooltip:AddDoubleLine(L.STATS_REPAIRS, ns.Money(s.repairs), 1, 1, 1, 1, 1, 1)
+    end
+end
+
+-- shared by the clock, the minimap button and the Titan/LDB button
 function ns.FillTooltip(tooltip, hint)
-    tooltip:SetText(L.TITLE)
+    tooltip:SetText(L.TITLE .. VersionText())
     -- only what is switched on, to keep the tooltip short
     if ns.AnyEnabled() then
         for _, t in ipairs(ns.toggles) do
-            if ns.db[t.key] then
+            if not t.option and ns.db[t.key] then
                 tooltip:AddDoubleLine(t.label, L.ON, 1, 1, 1, GREEN[1], GREEN[2], GREEN[3])
             end
         end
     else
         tooltip:AddLine(L.ALL_OFF, GREY[1], GREY[2], GREY[3])
     end
+    if ns.db.stats then AddStats(tooltip) end
     tooltip:AddLine(hint, 0.7, 0.7, 0.7)
 end
 
@@ -417,6 +443,8 @@ local function CreateSettingsMenu()
     CreateSettingRow(f, L.SHOW_ICON, "shown")
     CreateSettingRow(f, L.LOCK, "locked")
     CreateSettingRow(f, L.TOOLTIP, "tooltip")
+    CreateSettingRow(f, L.SESSION_STATS, "stats")
+    CreateSettingRow(f, L.MINIMAP_BUTTON, "minimap")
     CreateActionRow(f, L.RESET_POSITION, function()
         ns.ResetPosition()
         PlacePopup(f)
@@ -526,6 +554,8 @@ function ns.RefreshUI()
         if f:IsShown() then Layout(f) end
     end
     ns.UpdateMailButton()
+    ns.UpdateMinimapButton()
+    ns.NotifyOptions()
 end
 
 function ns.ResetPosition()

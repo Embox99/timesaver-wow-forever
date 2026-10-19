@@ -8,11 +8,17 @@
     <Binding name="TIMESAVER_AUTOQUEST" category="ADDONS">
         Timesaver_ToggleFeature("autoQuest")
     </Binding>
+    <Binding name="TIMESAVER_SKIPTRIVIAL" category="ADDONS">
+        Timesaver_ToggleFeature("skipTrivial")
+    </Binding>
     <Binding name="TIMESAVER_AUTOTURNIN" category="ADDONS">
         Timesaver_ToggleFeature("autoTurnIn")
     </Binding>
     <Binding name="TIMESAVER_BESTREWARD" category="ADDONS">
         Timesaver_ToggleFeature("bestReward")
+    </Binding>
+    <Binding name="TIMESAVER_SKIPGOSSIP" category="ADDONS">
+        Timesaver_ToggleFeature("skipGossip")
     </Binding>
     <Binding name="TIMESAVER_SELLJUNK" category="ADDONS">
         Timesaver_ToggleFeature("sellJunk")
@@ -23,8 +29,14 @@
     <Binding name="TIMESAVER_MAILTAKEALL" category="ADDONS">
         Timesaver_ToggleFeature("mailTakeAll")
     </Binding>
+    <Binding name="TIMESAVER_BAGWARNING" category="ADDONS">
+        Timesaver_ToggleFeature("bagWarning")
+    </Binding>
     <Binding name="TIMESAVER_ACCEPTINVITES" category="ADDONS">
         Timesaver_ToggleFeature("acceptInvites")
+    </Binding>
+    <Binding name="TIMESAVER_ACCEPTRES" category="ADDONS">
+        Timesaver_ToggleFeature("acceptRes")
     </Binding>
     <Binding name="TIMESAVER_DECLINEDUELS" category="ADDONS">
         Timesaver_ToggleFeature("declineDuels")

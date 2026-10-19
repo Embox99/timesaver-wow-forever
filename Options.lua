@@ -5,14 +5,30 @@ local _, ns = ...
 local L = ns.L
 
 local category
+local variables = {}  -- every registered setting, refreshed by ns.NotifyOptions
+local applying = false -- a change made on this page is being applied
 
 local function Var(id)
     return "Timesaver_" .. id
 end
 
+-- runs a change coming from the page itself; the page already shows it
+local function Apply(fn, value)
+    applying = true
+    local ok, err = pcall(fn, value)
+    applying = false
+    if not ok then geterrorhandler()(err) end
+end
+
+local function Register(cat, id, varType, name, default, get, set)
+    local variable = Var(id)
+    variables[#variables + 1] = variable
+    return Settings.RegisterProxySetting(cat, variable, varType, name, default,
+        get, function(value) Apply(set, value) end)
+end
+
 local function AddCheckbox(cat, id, name, tooltip, default, get, set)
-    local setting = Settings.RegisterProxySetting(cat, Var(id),
-        Settings.VarType.Boolean, name, default, get, set)
+    local setting = Register(cat, id, Settings.VarType.Boolean, name, default, get, set)
     Settings.CreateCheckbox(cat, setting, tooltip)
 end
 
@@ -26,16 +42,17 @@ local function AddDBCheckbox(cat, key, name, tooltip)
 end
 
 local function AddSlider(cat, key, name, tooltip, min, max, step, suffix)
-    local setting = Settings.RegisterProxySetting(cat, Var(key),
-        Settings.VarType.Number, name, ns.defaults[key],
+    local setting = Register(cat, key, Settings.VarType.Number, name, ns.defaults[key],
         function() return ns.db[key] end,
         function(value)
-            ns.db[key] = value
+            -- sliders can report 21.9999; keep whole steps
+            value = min + math.floor((value - min) / step + 0.5) * step
+            ns.db[key] = math.min(max, math.max(min, value))
             ns.RefreshUI()
         end)
     local options = Settings.CreateSliderOptions(min, max, step)
     options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right,
-        function(value) return value .. suffix end)
+        function(value) return math.floor(value + 0.5) .. suffix end)
     Settings.CreateSlider(cat, setting, options, tooltip)
 end
 
@@ -65,6 +82,8 @@ function ns.InitOptions()
     AddDBCheckbox(cat, "shown", L.SHOW_ICON, L.DESC_SHOW_ICON)
     AddDBCheckbox(cat, "locked", L.LOCK, nil)
     AddDBCheckbox(cat, "tooltip", L.TOOLTIP, nil)
+    AddDBCheckbox(cat, "stats", L.SESSION_STATS, L.DESC_STATS)
+    AddDBCheckbox(cat, "minimap", L.MINIMAP_BUTTON, L.DESC_MINIMAP)
     AddSlider(cat, "size", L.ICON_SIZE, nil, 16, 40, 2, " px")
     AddSlider(cat, "alpha", L.OPACITY, nil, 30, 100, 10, "%")
     layout:AddInitializer(CreateSettingsButtonInitializer(L.RESET_POSITION,
@@ -74,8 +93,18 @@ function ns.InitOptions()
     category = cat
 end
 
+-- Changes made in the clock menus, by key or by command: refresh the
+-- checkboxes and sliders here in case the page is open right now.
+function ns.NotifyOptions()
+    if applying or not category or not Settings.NotifyUpdate then return end
+    for _, variable in ipairs(variables) do
+        Settings.NotifyUpdate(variable)
+    end
+end
+
 -- the game's key binding screen (the Timesaver section is under AddOns)
 function ns.OpenKeybindings()
+    if not ns.CanOpenWindows() then return end
     if Settings and Settings.KEYBINDINGS_CATEGORY_ID then
         Settings.OpenToCategory(Settings.KEYBINDINGS_CATEGORY_ID)
     elseif KeyBindingFrame_LoadUI then
@@ -85,7 +114,6 @@ function ns.OpenKeybindings()
 end
 
 function ns.OpenOptions()
-    if category then
-        Settings.OpenToCategory(category:GetID())
-    end
+    if not category or not ns.CanOpenWindows() then return end
+    Settings.OpenToCategory(category:GetID())
 end

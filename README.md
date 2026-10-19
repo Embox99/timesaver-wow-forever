@@ -12,12 +12,16 @@ unwanted social requests.
 |---|---|
 | Auto loot | Takes everything from the loot window at once. |
 | Accept quests | Accepts quests from NPCs, gossip menus, quest boards and escort quests. |
+| Skip grey quests | With "Accept quests": leaves out quests too low for your level. |
 | Turn in quests | Completes finished quests; stops when a reward has to be chosen. |
 | Best reward | Picks the quest reward that sells for the most. |
+| Skip NPC chatter | Picks the only dialogue option of NPCs without quests. |
 | Sell junk | Sells grey items when a vendor window opens. |
 | Auto repair | Repairs everything at vendors who can repair. |
 | Mail: take all | Adds a "Take all" button to the mailbox (letters with COD are skipped). |
+| Bags full warning | Warns when only 2 free bag slots are left. |
 | Friend invites | Accepts group invites from friends and guild members. |
+| Friend res/summon | Accepts resurrections and summons from friends and guild members. |
 | Decline duels / guild invites / trades | Declines them from players who are neither friends nor guild members. |
 
 **Hold Shift** while looting, talking to an NPC or opening a vendor to skip the
@@ -28,15 +32,19 @@ automation once. Every feature is off until you switch it on.
 - **Left click** – menu with all features and the **Fast bind** button
   (opens key bindings).
 - **Right click** – quick settings: icon size and opacity, show/lock the
-  icon, tooltip, reset position, and which features are listed in the menu.
+  icon, tooltip, session stats, minimap button, reset position, and which
+  features are listed in the menu.
 - Drag to move. The ring turns gold while at least one feature is on.
 
 Also available:
 
 - **Options page:** Esc > Options > AddOns > Timesaver.
 - **Key bindings** for every feature: Esc > Options > Keybindings > AddOns.
+- **Minimap button** (off by default) with the same menus.
 - **Titan Panel** (and other LibDataBroker displays): a Timesaver button
   with the same menus; the floating clock can then be hidden.
+- **Session stats** (off by default) in the tooltip: quests accepted and
+  turned in, money from junk, repair costs.
 
 ## Commands
 

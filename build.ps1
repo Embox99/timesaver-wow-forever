@@ -10,8 +10,8 @@ $addon = "Timesaver"
 # files that ship in the zip; keep in sync with the ignore list in .pkgmeta
 $files = @(
     "Timesaver.toc", "Bindings.xml",
-    "Locales.lua", "Core.lua", "Quests.lua", "Vendor.lua", "Mail.lua",
-    "Social.lua", "UI.lua", "Options.lua", "Broker.lua",
+    "Locales.lua", "Core.lua", "Quests.lua", "Vendor.lua", "Mail.lua", "Bags.lua",
+    "Social.lua", "UI.lua", "Minimap.lua", "Options.lua", "Broker.lua",
     "Media\icon.tga",
     "CHANGELOG.md"
 )

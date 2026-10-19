@@ -1,19 +1,26 @@
 -- Settings, event dispatch and slash commands.
--- Automation lives in Quests.lua, Vendor.lua, Mail.lua and Social.lua; visuals in UI.lua.
+-- Automation lives in Quests.lua, Vendor.lua, Mail.lua, Bags.lua and Social.lua;
+-- visuals in UI.lua and Minimap.lua.
 local ADDON, ns = ...
 local L = ns.L
 
 -- Rows of the menu, in display order. icon: Interface\Icons\<name>,
 -- or a full path for the quest "!" / "?" glyphs.
+-- option = true: a setting of the feature above it, not a feature of its
+-- own, so it doesn't turn the clock ring gold or show in its tooltip.
 ns.toggles = {
     { key = "autoLoot",      label = L.AUTO_LOOT,      icon = "INV_Misc_Bag_10" },
     { key = "autoQuest",     label = L.AUTO_ACCEPT,    icon = "Interface\\GossipFrame\\AvailableQuestIcon" },
+    { key = "skipTrivial",   label = L.SKIP_TRIVIAL,   icon = "INV_Misc_Note_02", option = true },
     { key = "autoTurnIn",    label = L.AUTO_TURN_IN,   icon = "Interface\\GossipFrame\\ActiveQuestIcon" },
     { key = "bestReward",    label = L.BEST_REWARD,    icon = "INV_Misc_Gift_01" },
+    { key = "skipGossip",    label = L.SKIP_GOSSIP,    icon = "INV_Misc_Book_09" },
     { key = "sellJunk",      label = L.SELL_JUNK,      icon = "INV_Misc_Coin_01" },
     { key = "autoRepair",    label = L.AUTO_REPAIR,    icon = "Trade_BlackSmithing" },
     { key = "mailTakeAll",   label = L.MAIL_TAKE_ALL,  icon = "INV_Letter_15" },
+    { key = "bagWarning",    label = L.BAG_WARNING,    icon = "INV_Misc_Bag_08" },
     { key = "acceptInvites", label = L.ACCEPT_INVITES, icon = "Spell_Holy_PrayerOfFortitude" },
+    { key = "acceptRes",     label = L.ACCEPT_RES,     icon = "Spell_Holy_Resurrection" },
     { key = "declineDuels",  label = L.DECLINE_DUELS,  icon = "INV_Sword_04" },
     { key = "declineGuild",  label = L.DECLINE_GUILD,  icon = "INV_Shirt_GuildTabard_01" },
     { key = "declineTrades", label = L.DECLINE_TRADES, icon = "INV_Scroll_03" },
@@ -26,6 +33,10 @@ local defaults = {
     locked = false,
     shown = true,
     tooltip = true,
+    stats = false,        -- session statistics in the clock tooltip
+    minimap = false,      -- button on the minimap edge
+    minimapAngle = 225,   -- its position around the minimap, in degrees
+    introShown = false,   -- first-run hint already printed
     size = 20,   -- icon size in px
     alpha = 100, -- icon opacity in percent
     point = ns.defaultPosition.point,
@@ -38,6 +49,9 @@ for _, t in ipairs(ns.toggles) do
 end
 -- the options panel needs them for its "Defaults" button
 ns.defaults = defaults
+
+local GetMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+ns.VERSION = GetMetadata and GetMetadata(ADDON, "Version") or ""
 
 function ns.Print(msg)
     DEFAULT_CHAT_FRAME:AddMessage("|cffffd100" .. L.TITLE .. "|r: " .. msg)
@@ -58,6 +72,20 @@ end
 -- C_Item in the modern API; the global as a fallback
 ns.GetItemInfo = C_Item and C_Item.GetItemInfo or GetItemInfo
 
+-- Free slots in normal bags (quivers and soul bags don't count: regular
+-- items can't go there).
+function ns.FreeBagSlots()
+    local free = 0
+    for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
+        local slots, bagType = C_Container.GetContainerNumFreeSlots(bag)
+        if bagType == 0 then free = free + (slots or 0) end
+    end
+    return free
+end
+
+-- Session statistics, shown in the clock tooltip when enabled. Not saved.
+ns.stats = { accepted = 0, turnedIn = 0, junk = 0, repairs = 0 }
+
 function ns.Toggle(key)
     ns.db[key] = not ns.db[key]
     ns.RefreshUI()
@@ -65,7 +93,7 @@ end
 
 function ns.AnyEnabled()
     for _, t in ipairs(ns.toggles) do
-        if ns.db[t.key] then return true end
+        if not t.option and ns.db[t.key] then return true end
     end
     return false
 end
@@ -91,6 +119,15 @@ end
 function ns.SetFastBindShown(shown)
     ns.db.hidden.fastBind = not shown or nil
     ns.RefreshUI()
+end
+
+-- The game's settings and key binding windows can be blocked in combat.
+function ns.CanOpenWindows()
+    if InCombatLockdown() then
+        ns.Print(L.IN_COMBAT)
+        return false
+    end
+    return true
 end
 
 -- ---------------------------------------------------------------- key bindings
@@ -159,14 +196,25 @@ events:SetScript("OnEvent", function(self, event, ...)
         if name ~= ADDON then return end
         InitDB()
         ns.InitUI()
+        ns.InitMinimap()
         ns.InitOptions()
         self:UnregisterEvent("ADDON_LOADED")
         return
     end
     if not ns.db then return end
+    -- one module failing must not stop the others on the same event;
+    -- the error is still reported the usual way
     for _, fn in ipairs(handlers[event]) do
-        fn(...)
+        local ok, err = pcall(fn, ...)
+        if not ok then geterrorhandler()(err) end
     end
+end)
+
+-- one-time hint for new players, once the chat is ready
+ns.On("PLAYER_LOGIN", function()
+    if ns.db.introShown then return end
+    ns.db.introShown = true
+    ns.Print(L.INTRO)
 end)
 
 -- ---------------------------------------------------------------- slash
@@ -186,7 +234,7 @@ SlashCmdList.TIMESAVER = function(msg)
     elseif msg == "options" or msg == "config" then
         ns.OpenOptions()
     elseif msg == "help" then
-        ns.Print(L.HELP)
+        ns.Print(ns.VERSION .. "  " .. L.HELP)
     else
         db.shown = not db.shown
         ns.RefreshUI()

@@ -15,7 +15,9 @@ Core.lua
 Quests.lua
 Vendor.lua
 Mail.lua
+Bags.lua
 Social.lua
 UI.lua
+Minimap.lua
 Options.lua
 Broker.lua
