@@ -39,7 +39,8 @@ automation once. Every feature is off until you switch it on.
 Also available:
 
 - **Options page:** Esc > Options > AddOns > Timesaver.
-- **Key bindings** for every feature: Esc > Options > Keybindings > AddOns.
+- **Key bindings** for every feature, via Fast bind or Esc > Options >
+  Keybindings > AddOns.
 - **Minimap button** (off by default) with the same menus.
 - **Titan Panel** (and other LibDataBroker displays): a Timesaver button
   with the same menus; the floating clock can then be hidden.

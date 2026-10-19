@@ -2,6 +2,11 @@
 
 ## 1.1.0
 
+New:
+- Fast bind opens its own window: click a feature, press a key, done
+  (Esc cancels, Del removes the key). "All key bindings..." still opens
+  the game screen.
+
 New (all off by default):
 - Minimap button with the same menus; drag it around the minimap.
 - Skip grey quests when accepting quests automatically.
